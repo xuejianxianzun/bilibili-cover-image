@@ -14,7 +14,7 @@
 
 chrome扩展版使用右键菜单项；
 
-UserScript版使用ctrl+鼠标左键。
+UserScript版使用ctrl+鼠标右键。
 
 # 最近更新
 
