@@ -1,0 +1,31 @@
+{
+	"name": "获取哔哩哔哩bilibili视频的封面图片",
+	"version": "1.6.0",
+	"manifest_version": 2,
+	"description": "获取哔哩哔哩bilibili视频的封面图片",
+	"icons": {
+		"16": "icon/icon_16.png",
+		"32": "icon/icon_32.png",
+		"128": "icon/icon_128.png"
+	},
+	"browser_action": {
+		"default_icon": {
+			"16": "icon/icon_16.png",
+			"32": "icon/icon_32.png",
+			"128": "icon/icon_128.png"
+		},
+		"default_title": "获取哔哩哔哩封面图"
+	},
+	"content_scripts": [{
+		"matches": ["*://*.bilibili.com/*"],
+		"js": ["content.js"],
+		"run_at": "document_end"
+	}],
+	"background": {
+		"scripts": ["background.js"],
+		"persistent": false
+	},
+	"permissions": [
+		"contextMenus", "tabs", "*://*.bilibili.com/*"
+	]
+}
