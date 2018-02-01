@@ -1,83 +1,56 @@
 // ==UserScript==
 // @name		获取哔哩哔哩视频的封面图片 get bilibili cover image
 // @namespace	http://saber.love/?p=3259
-// @version		1.6.0
+// @version		1.7.0
 // @description	在视频列表上以及视频播放页面，按 ctrl+鼠标右键 ，就会在新窗口打开这个视频的封面图
 // @author		雪见仙尊 xuejianxianzun
 // @include		*://*bilibili.com/*
-// @icon        http://saber.love/favicon.ico
 // @license 	MIT
 // @icon 		https://www.bilibili.com/favicon.ico
 // @run-at		document-end
 // ==/UserScript==
 
-'use strict'
+'use strict';
+
+let is_found = false;
+let ownsName = ['scrollx', 'groom-module', 'card-live-module', 'rank-item', 'spread-module', 'card-timing-module', 'l-item', 'v', 'vb', 'v-item', 'small-item', 'cover-normal', 'common-lazy-img', 'biref-img', 'game-groom-m', 'i-pin-c', 'anchor-card', 'special-module', 'chief-recom-item', 'bangumi-info-wrapper', 'similar-list-child', 'v1-bangumi-list-part-child', 'lv-preview', 'recom-item', 'misl-ep-img', 'media-info-inner', 'matrix', 'bangumi-list']; // 这里的class都是列表项本身
+let parentsName = ['bm-v-list', 'rlist', 'topic-preview']; // 这里的class是列表项的父元素
+
 // 获取触发右键菜单的元素
-document.body.addEventListener("contextmenu", function(e) {
-	var e = e || window.event;
-	if (e.ctrlKey) {
-		getCoverImage(e.target);
+document.body.addEventListener('contextmenu', function (e) {
+	let my_e = e || window.event;
+	if (my_e.ctrlKey) { // 每次点击进行初始化
+		is_found = false;
+		getCoverImage(my_e.target);
 	}
 });
 
 // 判断是否含有当前class
-let hasClass = (function() {
-	let div = document.createElement("div");
-	if ("classList" in div && typeof div.classList.contains === "function") {
-		return function(elem, className) {
-			return elem.classList.contains(className);
-		};
-	} else {
-		return function(elem, className) {
-			let classes = elem.className.split(/\s+/);
-			for (let i = 0; i < classes.length; i++) {
-				if (classes[i] === className) {
-					return true;
-				}
-			}
-			return false;
-		};
-	}
-})();
-
-let ownsName = ["scrollx", "groom-module", "card-live-module", "rank-item", "spread-module", "card-timing-module", "l-item", "v", "vb", "v-item", "anchor-card", "small-item", "cover-normal", "common-lazy-img", "biref-img", "game-groom-m", "i-pin-c"]; // 这里的class都是列表项本身
-let parentsName = ["bm-v-list", "rlist"]; // 这里的class是列表项的父元素
+function hasClass(element, className) {
+	return element.classList.contains(className);
+}
 
 function getCoverImage(element) {
-	/*if (element.nodeName === "IMG") { // 当前元素是img的情况
-		openCoverImage(element.src);
-	}*/
-	if (element.nodeName === "BODY") { // 当前元素是body的情况
-		// 尝试获取视频播放页的封面图
-		let cover_image = document.body.querySelector("img.cover_image");
-		if (!!cover_image) {
-			openCoverImage(cover_image.src);
-		} else {
-			console.log("body, none");
-		}
-		return false;
-	} else {
-		let finded = false;
-		// 测试当前元素是否符合要求
-		for (let i = 0; i < ownsName.length; i++) {
-			if (hasClass(element, ownsName[i])) {
-				// console.log(ownsName[i]);
-				if (ownsName[i] === "anchor-card") { //anchor-card这个class是直播页面的
-					if (!!element.style.backgroundImage) {
-						openCoverImage(/\/\/.*(?=")/.exec(element.style.backgroundImage)[0]);
-					} else {
-						openCoverImage(/\/\/.*(?=")/.exec(element.querySelector(".room-cover").style.backgroundImage)[0]);
-					}
-				} else if (ownsName[i] === "video-block") {
-					openCoverImage(/\/\/.*(?=")/.exec(element.querySelector(".video-preview").style.backgroundImage)[0]);
+	// 首先测试当前元素是否符合要求
+	for (let i = 0; i < ownsName.length; i++) {
+		if (hasClass(element, ownsName[i])) {
+			if (ownsName[i] === 'anchor-card') { //anchor-card这个class是直播列表的
+				if (!!element.style.backgroundImage) {
+					openCoverImage(/\/\/.*(?=")/.exec(element.style.backgroundImage)[0]);
 				} else {
-					openCoverImage(element.querySelector("img").src);
+					openCoverImage(/\/\/.*(?=")/.exec(element.querySelector('.room-cover').style.backgroundImage)[0]);
 				}
-				finded = true;
-				break;
+			} else if (ownsName[i] === 'video-block') {
+				openCoverImage(/\/\/.*(?=")/.exec(element.querySelector('.video-preview').style.backgroundImage)[0]);
+			} else {
+				openCoverImage(element.querySelector('img').src);
 			}
+			is_found = true;
+			break;
 		}
-		// 测试父元素是否符合要求
+	}
+	if (is_found === false) {
+		// 之后测试父元素是否符合要求
 		let parentNode = element.parentNode;
 		for (let i = 0; i < parentsName.length; i++) {
 			if (hasClass(parentNode, parentsName[i])) {
@@ -85,16 +58,41 @@ function getCoverImage(element) {
 				let childrens = parentNode.childNodes;
 				for (let j = 0; j < childrens.length; j++) {
 					if (childrens[j] === element) {
-						openCoverImage(element.querySelector("img").src);
-						finded = true;
+						openCoverImage(element.querySelector('img').src);
+						is_found = true;
 						break;
 					}
 				}
 			}
 		}
-		// 如果都没有找到，则返回父元素
-		if (finded === false) {
-			return getCoverImage(parentNode);
+		if (is_found === false) {
+			// 如果没有到BODY，则循环返回父元素进行查找
+			if (parentNode.tagName !== 'BODY') {
+				return getCoverImage(parentNode);
+			} else {
+				// 如果到了BODY仍然没有找到，尝试直接获取视频播放页的封面。优先级要低，如果放在前面的话，用户点击播放页面的其他封面就不起作用了
+				// 尝试直接获取储存封面图的IMG标签
+				let cover_img = document.querySelector('.cover_image');
+				if (cover_img !== null) {
+					openCoverImage(cover_img.src);
+					return false;
+				}
+				// 有些视频要从meta中获取封面图
+				let meta_info = document.querySelector('meta[itemprop="image"]');
+				if (meta_info !== null) {
+					openCoverImage(meta_info.content);
+					return false;
+				}
+				// 番剧播放页，使用另一个meta
+				let bangumi_meta_info = document.querySelector('meta[property="og:image"]');
+				if (bangumi_meta_info !== null) {
+					openCoverImage(bangumi_meta_info.content);
+					return false;
+				}
+				// 最后也没找到
+				console.log('cover not found');
+				return false;
+			}
 		}
 	}
 }
@@ -102,17 +100,17 @@ function getCoverImage(element) {
 function openCoverImage(url) {
 	let coverImageBigUrl = url;
 	// 去除url中的裁剪标识
-	if (url.indexOf("@") > -1) { //处理以@做裁剪标识的url
-		coverImageBigUrl = url.split("@")[0];
+	if (url.indexOf('@') > -1) { //处理以@做裁剪标识的url
+		coverImageBigUrl = url.split('@')[0];
 	}
-	if (url.indexOf("jpg_") > -1) { //处理以_做裁剪标识的url
-		coverImageBigUrl = url.split("jpg_")[0] + "jpg"; //默认所有图片都是jpg格式的。如果不是jpg，则可能会出错
+	if (url.indexOf('jpg_') > -1) { //处理以_做裁剪标识的url
+		coverImageBigUrl = url.split('jpg_')[0] + 'jpg'; //默认所有图片都是jpg格式的。如果不是jpg，则可能会出错
 	}
-	if (url.indexOf("png_") > -1) { //处理以_做裁剪标识的url
-		coverImageBigUrl = url.split("png_")[0] + "png";
+	if (url.indexOf('png_') > -1) { //处理以_做裁剪标识的url
+		coverImageBigUrl = url.split('png_')[0] + 'png';
 	}
-	if (url.indexOf("/320_200/") > -1) { //有时裁剪标识是在后缀名之前的 目前主要发现的是“番剧”板块的列表里有，但尚不清楚其他地方的情况
-		coverImageBigUrl = url.replace("/320_200", "");
+	if (url.indexOf('/320_200/') > -1) { //有时裁剪标识是在后缀名之前的 目前主要发现的是“番剧”板块的列表里有，但尚不清楚其他地方的情况
+		coverImageBigUrl = url.replace('/320_200', '');
 	}
 	window.open(coverImageBigUrl);
 }
