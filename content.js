@@ -1,18 +1,21 @@
 'use strict';
 
 let is_found = false;
-let ownsName = ['scrollx', 'groom-module', 'card-live-module', 'rank-item', 'spread-module', 'card-timing-module', 'l-item', 'v', 'vb', 'v-item', 'small-item', 'cover-normal', 'common-lazy-img', 'biref-img', 'game-groom-m', 'i-pin-c', 'anchor-card', 'special-module', 'chief-recom-item', 'bangumi-info-wrapper', 'similar-list-child', 'v1-bangumi-list-part-child', 'lv-preview', 'recom-item', 'misl-ep-img', 'media-info-inner', 'matrix', 'bangumi-list']; // 这里的class都是列表项本身
+let ownsName = ['scrollx', 'groom-module', 'card-live-module', 'rank-item', 'spread-module', 'card-timing-module', 'l-item', 'v', 'vb', 'v-item', 'small-item', 'cover-normal', 'common-lazy-img', 'biref-img', 'game-groom-m', 'i-pin-c', 'anchor-item', 'room-cover-wrapper', 'room-card-item', 'special-module', 'chief-recom-item', 'bangumi-info-wrapper', 'similar-list-child', 'v1-bangumi-list-part-child', 'lv-preview', 'recom-item', 'misl-ep-img', 'media-info-inner', 'matrix', 'bangumi-list', 'bilibili-player-recommend-left', 'bilibili-player-ending-panel-box-recommend', 'album-top', 'm-recommend-item']; // 这里的class都是列表项本身
 let parentsName = ['bm-v-list', 'rlist', 'topic-preview']; // 这里的class是列表项的父元素
+let reg1 = /\/\/.*(?=")/;
+
+// ----------右键部分和user.js不同，不同的部分开始
 
 // 获取触发右键菜单的元素
 let contextmenuTarget;
-document.body.addEventListener('contextmenu', function(e) {
+document.body.addEventListener('contextmenu', function (e) {
 	contextmenuTarget = e.target;
 });
 
 // 监听从扩展发送的消息 下面这个api是扩展和前台脚本通用的
 chrome.runtime.onMessage.addListener(
-	function(message, sender, sendResponse) {
+	function (message, sender, sendResponse) {
 		if (message === 'getCoverImage') {
 			//开始获取封面图
 			is_found = false;
@@ -21,23 +24,39 @@ chrome.runtime.onMessage.addListener(
 	}
 );
 
+// ----------不同的部分结束，下面依旧相同
+
 // 判断是否含有当前class
 function hasClass(element, className) {
 	return element.classList.contains(className);
+}
+
+// 获取子元素的背景图片
+function getBG(element, find_class) {
+	if (find_class !== 0) { // 0为元素自身，即不查找子元素
+		element = element.querySelector(find_class);
+	}
+	return reg1.exec(element.style.backgroundImage)[0];
 }
 
 function getCoverImage(element) {
 	// 首先测试当前元素是否符合要求
 	for (let i = 0; i < ownsName.length; i++) {
 		if (hasClass(element, ownsName[i])) {
-			if (ownsName[i] === 'anchor-card') { //anchor-card这个class是直播列表的
-				if (!!element.style.backgroundImage) {
-					openCoverImage(/\/\/.*(?=")/.exec(element.style.backgroundImage)[0]);
-				} else {
-					openCoverImage(/\/\/.*(?=")/.exec(element.querySelector('.room-cover').style.backgroundImage)[0]);
-				}
+			if (ownsName[i] === 'anchor-item') { //直播列表上部分
+				openCoverImage(getBG(element, '.anchor-cover'));
+			} else if (ownsName[i] === 'room-cover-wrapper') { //直播列表下部分
+				openCoverImage(getBG(element, '.room-cover'));
+			} else if (ownsName[i] === 'room-card-item') { //直播分类页面的列表
+				openCoverImage(getBG(element, '.cover'));
+			} else if (ownsName[i] === 'album-top') { //相册封面
+				openCoverImage(getBG(element, '.album-img'));
 			} else if (ownsName[i] === 'video-block') {
-				openCoverImage(/\/\/.*(?=")/.exec(element.querySelector('.video-preview').style.backgroundImage)[0]);
+				openCoverImage(getBG(element, '.video-preview'));
+			} else if (ownsName[i] === 'bilibili-player-ending-panel-box-recommend') {
+				openCoverImage(getBG(element, '.bilibili-player-ending-panel-box-recommend-img'));
+			} else if (ownsName[i] === 'm-recommend-item') {
+				openCoverImage(getBG(element, 0));
 			} else {
 				openCoverImage(element.querySelector('img').src);
 			}
@@ -83,6 +102,11 @@ function getCoverImage(element) {
 				let bangumi_meta_info = document.querySelector('meta[property="og:image"]');
 				if (bangumi_meta_info !== null) {
 					openCoverImage(bangumi_meta_info.content);
+					return false;
+				}
+				// 以上规则里都找不到时，直接取img的src
+				if (contextmenuTarget.tagName === 'IMG') {
+					openCoverImage(contextmenuTarget.src);
 					return false;
 				}
 				// 最后也没找到
