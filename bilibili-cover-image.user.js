@@ -13,7 +13,7 @@
 'use strict';
 
 let is_found = false;
-let ownsName = ['scrollx', 'groom-module', 'card-live-module', 'rank-item', 'spread-module', 'card-timing-module', 'l-item', 'v', 'vb', 'v-item', 'small-item', 'cover-normal', 'common-lazy-img', 'biref-img', 'game-groom-m', 'i-pin-c', 'anchor-item', 'room-cover-wrapper', 'room-card-item', 'special-module', 'chief-recom-item', 'bangumi-info-wrapper', 'similar-list-child', 'v1-bangumi-list-part-child', 'lv-preview', 'recom-item', 'misl-ep-img', 'media-info-inner', 'matrix', 'bangumi-list', 'bilibili-player-recommend-left', 'bilibili-player-ending-panel-box-recommend', 'album-top', 'm-recommend-item']; // 这里的class都是列表项本身
+let ownsName = ['scrollx', 'groom-module', 'card-live-module', 'rank-item', 'spread-module', 'card-timing-module', 'image-area', 'l-item', 'v', 'vb', 'v-item', 'small-item', 'cover-normal', 'common-lazy-img', 'biref-img', 'game-groom-m', 'i-pin-c', 'anchor-item', 'room-cover-wrapper', 'room-card-item', 'special-module', 'chief-recom-item', 'bangumi-info-wrapper', 'similar-list-child', 'v1-bangumi-list-part-child', 'lv-preview', 'recom-item', 'misl-ep-img', 'media-info-inner', 'matrix', 'bangumi-list', 'bilibili-player-recommend-left', 'bilibili-player-ending-panel-box-recommend', 'album-top', 'm-recommend-item']; // 这里的class都是列表项本身
 let parentsName = ['bm-v-list', 'rlist', 'topic-preview']; // 这里的class是列表项的父元素
 let reg1 = /\/\/.*(?=")/;
 
