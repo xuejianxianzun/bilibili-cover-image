@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name		获取哔哩哔哩视频的封面图片 get bilibili cover image
 // @namespace	http://saber.love/?p=3259
-// @version		1.9.0
+// @version		1.9.2
 // @description	在视频列表上以及视频播放页面，按 ctrl+鼠标右键 ，就会在新窗口打开这个视频的封面图
 // @author		雪见仙尊 xuejianxianzun
 // @include		*://*bilibili.com/*
@@ -13,7 +13,7 @@
 'use strict';
 
 let is_found = false;
-let ownsName = ['scrollx', 'groom-module', 'card-live-module', 'rank-item', 'spread-module', 'card-timing-module', 'image-area', 'l-item', 'v', 'vb', 'v-item', 'small-item', 'cover-normal', 'common-lazy-img', 'biref-img', 'game-groom-m', 'i-pin-c', 'anchor-item', 'room-cover-wrapper', 'room-card-item', 'special-module', 'chief-recom-item', 'bangumi-info-wrapper', 'similar-list-child', 'v1-bangumi-list-part-child', 'lv-preview', 'recom-item', 'misl-ep-img', 'media-info-inner', 'matrix', 'bangumi-list', 'bilibili-player-recommend-left', 'bilibili-player-ending-panel-box-recommend', 'album-top', 'm-recommend-item']; // 这里的class都是列表项本身
+let ownsName = ['scrollx', 'groom-module', 'card-live-module', 'rank-item', 'spread-module', 'card-timing-module', 'image-area', 'l-item', 'v', 'vb', 'v-item', 'small-item', 'cover-normal', 'common-lazy-img', 'biref-img', 'game-groom-m', 'i-pin-c', 'anchor-item', 'room-cover-wrapper', 'room-card-item', 'special-module', 'chief-recom-item', 'bangumi-info-wrapper', 'similar-list-child', 'v1-bangumi-list-part-child', 'lv-preview', 'recom-item', 'misl-ep-img', 'media-info-inner', 'matrix', 'bangumi-list', 'bilibili-player-recommend-left', 'bilibili-player-ending-panel-box-recommend', 'album-top', 'm-recommend-item', 'card-box']; // 这里的class都是列表项本身
 let parentsName = ['bm-v-list', 'rlist', 'topic-preview']; // 这里的class是列表项的父元素
 let reg1 = /\/\/.*(?=")/;
 
