@@ -2,7 +2,7 @@
 
 let is_found = false;
 let ownsName = ['scrollx', 'groom-module', 'card-live-module', 'rank-item', 'spread-module', 'card-timing-module', 'l-item', 'v', 'vb', 'v-item', 'small-item', 'cover-normal', 'common-lazy-img', 'biref-img', 'game-groom-m', 'i-pin-c', 'anchor-item', 'room-cover-wrapper', 'room-card-item', 'special-module', 'chief-recom-item', 'bangumi-info-wrapper', 'similar-list-child', 'v1-bangumi-list-part-child', 'lv-preview', 'recom-item', 'misl-ep-img', 'media-info-inner', 'matrix', 'bangumi-list', 'bilibili-player-recommend-left', 'bilibili-player-ending-panel-box-recommend', 'album-top', 'm-recommend-item', 'card-box']; // 这里的class都是列表项本身
-let parentsName = ['bm-v-list', 'rlist', 'topic-preview']; // 这里的class是列表项的父元素
+let parentsName = ['bm-v-list', 'rlist', 'topic-preview', 'image-area']; // 这里的class是列表项的父元素
 let reg1 = /\/\/.*(?=")/;
 
 // ----------右键部分和user.js不同，不同的部分开始
@@ -73,7 +73,11 @@ function getCoverImage(element) {
 				let childrens = parentNode.childNodes;
 				for (let j = 0; j < childrens.length; j++) {
 					if (childrens[j] === element) {
-						openCoverImage(element.querySelector('img').src);
+						if (hasClass(childrens[j], 'danmu-module')) { // 动态 里面的封面图，特殊处理
+							openCoverImage(element.parentNode.querySelector('img').src);
+						} else {
+							openCoverImage(element.querySelector('img').src);
+						}
 						is_found = true;
 						break;
 					}
